@@ -7,11 +7,11 @@ type Item struct {
 
 func UpdateQuality(items []*Item) {
 	for _, item := range items {
-		updateQuality(item)
+		updateQuality(item) // update Quality At the end of each day
 
-		updateSellIn(item)
+		updateSellIn(item) // update SellIn At the end of each day
 
-		updateQualityAfterSellInChange(item)
+		updateQualityAfterSellInChange(item) // update Quality based on SellIn has passed expiry At the end of each day
 	}
 }
 
@@ -49,19 +49,18 @@ func updateSellIn(item *Item) {
 
 func updateQualityAfterSellInChange(item *Item) {
 	if item.SellIn < 0 {
-		if item.Name != "Aged Brie" {
-			if item.Name != "Backstage passes to a TAFKAL80ETC concert" {
-				if item.Quality > 0 {
-					if item.Name != "Sulfuras, Hand of Ragnaros" {
-						dropQualityByOne(item)
-					}
-				}
-			} else {
-				item.Quality = item.Quality - item.Quality
-			}
-		} else {
+		switch item.Name {
+		case "Aged Brie":
 			if item.Quality < 50 {
 				incrQualityByOne(item)
+			}
+		case "Backstage passes to a TAFKAL80ETC concert":
+			item.Quality = item.Quality - item.Quality
+		default:
+			if item.Quality > 0 {
+				if item.Name != "Sulfuras, Hand of Ragnaros" {
+					dropQualityByOne(item)
+				}
 			}
 		}
 	}
