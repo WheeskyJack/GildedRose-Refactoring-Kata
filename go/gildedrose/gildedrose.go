@@ -42,9 +42,13 @@ func updateQuality(item *Item) {
 }
 
 func updateSellIn(item *Item) {
-	if item.Name != "Sulfuras, Hand of Ragnaros" {
+	switch item.Name {
+	case "Sulfuras, Hand of Ragnaros":
+		// do nothing
+	default:
 		dropSellInByOne(item)
 	}
+	return
 }
 
 func updateQualityAfterSellInChange(item *Item) {
@@ -56,11 +60,11 @@ func updateQualityAfterSellInChange(item *Item) {
 			}
 		case "Backstage passes to a TAFKAL80ETC concert":
 			item.Quality = item.Quality - item.Quality
+		case "Sulfuras, Hand of Ragnaros":
+			// do nothing
 		default:
 			if item.Quality > 0 {
-				if item.Name != "Sulfuras, Hand of Ragnaros" {
-					dropQualityByOne(item)
-				}
+				dropQualityByOne(item)
 			}
 		}
 	}
