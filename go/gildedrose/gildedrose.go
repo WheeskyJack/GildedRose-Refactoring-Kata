@@ -18,22 +18,14 @@ func UpdateQuality(items []*Item) {
 func updateQuality(item *Item) {
 	switch item.Name {
 	case "Aged Brie":
-		if item.Quality < 50 {
-			incrQualityByOne(item)
-		}
+		incrQualityByOneWithUpperLimit50(item)
 	case "Backstage passes to a TAFKAL80ETC concert":
-		if item.Quality < 50 {
-			incrQualityByOne(item)
-			if item.SellIn < 11 {
-				if item.Quality < 50 {
-					incrQualityByOne(item)
-				}
-			}
-			if item.SellIn < 6 {
-				if item.Quality < 50 {
-					incrQualityByOne(item)
-				}
-			}
+		incrQualityByOneWithUpperLimit50(item)
+		if item.SellIn < 11 {
+			incrQualityByOneWithUpperLimit50(item)
+		}
+		if item.SellIn < 6 {
+			incrQualityByOneWithUpperLimit50(item)
 		}
 	case "Sulfuras, Hand of Ragnaros":
 		// do nothing
@@ -58,9 +50,7 @@ func updateQualityAfterSellInExpiry(item *Item) {
 	if item.SellIn < 0 {
 		switch item.Name {
 		case "Aged Brie":
-			if item.Quality < 50 {
-				incrQualityByOne(item)
-			}
+			incrQualityByOneWithUpperLimit50(item)
 		case "Backstage passes to a TAFKAL80ETC concert":
 			item.Quality = item.Quality - item.Quality
 		case "Sulfuras, Hand of Ragnaros":
@@ -77,8 +67,10 @@ func dropQualityByOne(item *Item) {
 	item.Quality = item.Quality - 1
 }
 
-func incrQualityByOne(item *Item) {
-	item.Quality = item.Quality + 1
+func incrQualityByOneWithUpperLimit50(item *Item) {
+	if item.Quality < 50 {
+		item.Quality = item.Quality + 1
+	}
 }
 
 func dropSellInByOne(item *Item) {
