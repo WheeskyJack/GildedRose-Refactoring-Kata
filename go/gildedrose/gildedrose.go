@@ -5,54 +5,80 @@ type Item struct {
 	SellIn, Quality int
 }
 
+var (
+	Sulfuras = "Sulfuras, Hand of Ragnaros"
+	Brie     = "Aged Brie"
+	Passes   = "Backstage passes to a TAFKAL80ETC concert"
+)
+
 func UpdateQuality(items []*Item) {
-	for i := 0; i < len(items); i++ {
+	for _, item := range items {
 
-		if items[i].Name != "Aged Brie" && items[i].Name != "Backstage passes to a TAFKAL80ETC concert" {
-			if items[i].Quality > 0 {
-				if items[i].Name != "Sulfuras, Hand of Ragnaros" {
-					items[i].Quality = items[i].Quality - 1
-				}
-			}
-		} else {
-			if items[i].Quality < 50 {
-				items[i].Quality = items[i].Quality + 1
-				if items[i].Name == "Backstage passes to a TAFKAL80ETC concert" {
-					if items[i].SellIn < 11 {
-						if items[i].Quality < 50 {
-							items[i].Quality = items[i].Quality + 1
-						}
-					}
-					if items[i].SellIn < 6 {
-						if items[i].Quality < 50 {
-							items[i].Quality = items[i].Quality + 1
-						}
-					}
-				}
-			}
+		updateQuality(item) // update Quality At the end of each day
+
+		updateSellIn(item) // update SellIn At the end of each day
+
+		updateQualityAfterSellInExpiry(item) // update Quality if SellIn has passed expiry At the end of each day
+
+	}
+}
+
+func updateQuality(item *Item) {
+	switch item.Name {
+	case Brie:
+		incrQualityByOneWithUpperLimit50(item)
+	case Passes:
+		incrQualityByOneWithUpperLimit50(item)
+		if item.SellIn < 11 {
+			incrQualityByOneWithUpperLimit50(item)
 		}
-
-		if items[i].Name != "Sulfuras, Hand of Ragnaros" {
-			items[i].SellIn = items[i].SellIn - 1
+		if item.SellIn < 6 {
+			incrQualityByOneWithUpperLimit50(item)
 		}
+	case Sulfuras:
+		// do nothing
+	default:
+		dropQualityByOneWithLowerLimit0(item)
+	}
+}
 
-		if items[i].SellIn < 0 {
-			if items[i].Name != "Aged Brie" {
-				if items[i].Name != "Backstage passes to a TAFKAL80ETC concert" {
-					if items[i].Quality > 0 {
-						if items[i].Name != "Sulfuras, Hand of Ragnaros" {
-							items[i].Quality = items[i].Quality - 1
-						}
-					}
-				} else {
-					items[i].Quality = items[i].Quality - items[i].Quality
-				}
-			} else {
-				if items[i].Quality < 50 {
-					items[i].Quality = items[i].Quality + 1
-				}
-			}
+func updateSellIn(item *Item) {
+	switch item.Name {
+	case Sulfuras:
+		// do nothing
+	default:
+		dropSellInByOne(item)
+	}
+	return
+}
+
+func updateQualityAfterSellInExpiry(item *Item) {
+	if item.SellIn < 0 {
+		switch item.Name {
+		case Brie: // increases twice as fast post expiry
+			incrQualityByOneWithUpperLimit50(item)
+		case Passes:
+			item.Quality = 0
+		case Sulfuras:
+			// do nothing
+		default: // decreases twice as fast post expiry
+			dropQualityByOneWithLowerLimit0(item)
 		}
 	}
+}
 
+func dropQualityByOneWithLowerLimit0(item *Item) {
+	if item.Quality > 0 {
+		item.Quality = item.Quality - 1
+	}
+}
+
+func incrQualityByOneWithUpperLimit50(item *Item) {
+	if item.Quality < 50 {
+		item.Quality = item.Quality + 1
+	}
+}
+
+func dropSellInByOne(item *Item) {
+	item.SellIn = item.SellIn - 1
 }
