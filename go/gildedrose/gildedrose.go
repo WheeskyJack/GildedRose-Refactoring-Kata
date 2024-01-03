@@ -5,6 +5,12 @@ type Item struct {
 	SellIn, Quality int
 }
 
+var (
+	Sulfuras = "Sulfuras, Hand of Ragnaros"
+	Brie     = "Aged Brie"
+	Passes   = "Backstage passes to a TAFKAL80ETC concert"
+)
+
 func UpdateQuality(items []*Item) {
 	for _, item := range items {
 
@@ -19,9 +25,9 @@ func UpdateQuality(items []*Item) {
 
 func updateQuality(item *Item) {
 	switch item.Name {
-	case "Aged Brie":
+	case Brie:
 		incrQualityByOneWithUpperLimit50(item)
-	case "Backstage passes to a TAFKAL80ETC concert":
+	case Passes:
 		incrQualityByOneWithUpperLimit50(item)
 		if item.SellIn < 11 {
 			incrQualityByOneWithUpperLimit50(item)
@@ -29,7 +35,7 @@ func updateQuality(item *Item) {
 		if item.SellIn < 6 {
 			incrQualityByOneWithUpperLimit50(item)
 		}
-	case "Sulfuras, Hand of Ragnaros":
+	case Sulfuras:
 		// do nothing
 	default:
 		dropQualityByOneWithLowerLimit0(item)
@@ -38,7 +44,7 @@ func updateQuality(item *Item) {
 
 func updateSellIn(item *Item) {
 	switch item.Name {
-	case "Sulfuras, Hand of Ragnaros":
+	case Sulfuras:
 		// do nothing
 	default:
 		dropSellInByOne(item)
@@ -49,13 +55,13 @@ func updateSellIn(item *Item) {
 func updateQualityAfterSellInExpiry(item *Item) {
 	if item.SellIn < 0 {
 		switch item.Name {
-		case "Aged Brie":
+		case Brie: // increases twice as fast post expiry
 			incrQualityByOneWithUpperLimit50(item)
-		case "Backstage passes to a TAFKAL80ETC concert":
+		case Passes:
 			item.Quality = 0
-		case "Sulfuras, Hand of Ragnaros":
+		case Sulfuras:
 			// do nothing
-		default:
+		default: // decreases twice as fast post expiry
 			dropQualityByOneWithLowerLimit0(item)
 		}
 	}
